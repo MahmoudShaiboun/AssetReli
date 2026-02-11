@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: aastreli-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./database/init:/docker-entrypoint-initdb.d
+    environment:
+      MONGO_INITDB_DATABASE: aastreli
+    networks:
+      - aastreli-network
+
+  # MQTT Broker (Mosquitto)
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    container_name: aastreli-mqtt
+    restart: always
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mqtt-broker/config:/mosquitto/config
+      - mqtt_data:/mosquitto/data
+      - mqtt_logs:/mosquitto/log
+    networks:
+      - aastreli-network
+
+  # ML Service
+  ml-service:
+    build: ./ml-service
+    container_name: aastreli-ml-service
+    restart: always
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ml-service/models:/app/models
+      - ./ml-service/feedback_data:/app/feedback_data
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DB=aastreli
+    depends_on:
+      - mongodb
+    networks:
+      - aastreli-network
+
+  # MQTT Ingestion Service
+  mqtt-ingestion:
+    build: ./mqtt-ingestion
+    container_name: aastreli-mqtt-ingestion
+    restart: always
+    ports:
+      - "8002:8002"
+    environment:
+      - MQTT_BROKER_HOST=mqtt-broker
+      - MQTT_BROKER_PORT=1883
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DB=aastreli
+      # SMTP Configuration (optional - for email notifications)
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL:-}
+      # Twilio Configuration (optional - for SMS notifications)
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - TWILIO_FROM_PHONE=${TWILIO_FROM_PHONE:-}
+    depends_on:
+      - mongodb
+      - mqtt-broker
+    networks:
+      - aastreli-network
+
+  # Backend API
+  backend-api:
+    build: ./backend-api
+    container_name: aastreli-backend-api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DB=aastreli
+      - ML_SERVICE_URL=http://ml-service:8001
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-secret-key-change-in-production}
+      - MQTT_SERVICE_URL=http://mqtt-ingestion:8002
+    depends_on:
+      - mongodb
+      - ml-service
+      - mqtt-ingestion
+    networks:
+      - aastreli-network
+
+  # React Frontend
+  frontend:
+    build: ./frontend
+    container_name: aastreli-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8002
+    depends_on:
+      - backend-api
+    networks:
+      - aastreli-network
+
+networks:
+  aastreli-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  mqtt_data:
+  mqtt_logs:
