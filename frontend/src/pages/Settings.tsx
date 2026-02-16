@@ -24,9 +24,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import axios from 'axios';
-import { triggerRetrain } from '../services/api';
-import authService from '../services/auth';
+import api, { triggerRetrain } from '../services/api';
 
 interface FaultAction {
   id: string;
@@ -65,9 +63,7 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/settings', {
-        headers: authService.getAuthHeader()
-      });
+      const response = await api.get('/settings');
       setSettings(response.data);
     } catch (err: any) {
       console.error('Failed to load settings:', err);
@@ -82,9 +78,7 @@ export default function Settings() {
     setError(null);
     
     try {
-      await axios.post('http://localhost:8000/settings', settings, {
-        headers: authService.getAuthHeader()
-      });
+      await api.post('/settings', settings);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
@@ -146,7 +140,7 @@ export default function Settings() {
   const handleTestAction = async (action: FaultAction) => {
     try {
       // Test the action by sending a test notification
-      await axios.post('http://localhost:8000/test-notification', {
+      await api.post('/test-notification', {
         type: action.type,
         config: action.config,
         message: 'Test notification from Aastreli system'
@@ -398,7 +392,7 @@ export default function Settings() {
         <Divider sx={{ mb: 2 }} />
         <Typography variant="body2" color="textSecondary">
           <strong>Frontend Version:</strong> 1.0.0<br />
-          <strong>Backend API:</strong> http://localhost:8000<br />
+          <strong>Backend API:</strong> http://localhost:8008<br />
           <strong>ML Service:</strong> http://localhost:8001<br />
           <strong>MQTT Broker:</strong> mqtt://localhost:1883<br />
           <strong>MongoDB:</strong> mongodb://localhost:27017

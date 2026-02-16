@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run React App (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000", 
+      "webRoot": "${workspaceFolder}/frontend/src",
+      "cwd": "${workspaceFolder}/frontend",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: start",
+      "postDebugTask": "terminate npm start"
+    },
+    
+  ],
+  "compounds": [
+        {
+        "name": "Run Full Stack",
+        "configurations": ["Run React App (Chrome)"]
+        }
+  ]
+}

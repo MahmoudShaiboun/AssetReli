@@ -102,7 +102,7 @@ export default function Feedback() {
   const fetchReadings = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:8000/sensor-readings`, {
+      const response = await axios.get(`http://localhost:8008/sensor-readings`, {
         params: {
           skip: (page - 1) * limit,
           limit: limit
@@ -188,7 +188,7 @@ export default function Feedback() {
         // Backend expects query parameters for original_prediction, corrected_label, feedback_type
         // and features as a JSON body (list)
         const response = await axios.post(
-          'http://localhost:8000/feedback',
+          'http://localhost:8008/feedback',
           features, // Send features array as the body
           {
             params: {

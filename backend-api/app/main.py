@@ -2,15 +2,16 @@ from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel
 from contextlib import asynccontextmanager
 import logging
 from datetime import datetime, timedelta
 import httpx
-from typing import Optional
+from typing import Optional, List
 
-from .config import settings
-from .database import get_database
-from .auth import (
+from config import settings
+from database import get_database
+from auth import (
     User, UserCreate, UserInDB, Token,
     get_password_hash, verify_password, create_access_token, verify_token,
     ACCESS_TOKEN_EXPIRE_MINUTES
@@ -24,8 +25,22 @@ security = HTTPBearer()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("🚀 Starting Backend API...")
-    app.mongodb_client = AsyncIOMotorClient(settings.MONGODB_URL)
-    app.mongodb = app.mongodb_client[settings.MONGODB_DB]
+    try:
+        app.mongodb_client = AsyncIOMotorClient(
+            settings.MONGODB_URL,
+            serverSelectionTimeoutMS=5000
+        )
+        # Test the connection
+        await app.mongodb_client.admin.command("ping")
+        app.mongodb = app.mongodb_client[settings.MONGODB_DB]
+        logger.info("✅ Connected to MongoDB")
+    except Exception as e:
+        logger.warning(f"⚠️ MongoDB not available: {e}")
+        app.mongodb_client = AsyncIOMotorClient(
+            settings.MONGODB_URL,
+            serverSelectionTimeoutMS=5000
+        )
+        app.mongodb = app.mongodb_client[settings.MONGODB_DB]
     logger.info("✅ Backend API ready!")
     yield
     app.mongodb_client.close()
@@ -231,9 +246,49 @@ async def get_all_users_settings(db=Depends(get_database)):
     return {"users_settings": all_settings}
 
 # Sensors endpoints
+
+class SensorCreate(BaseModel):
+    sensor_id: str
+    name: str
+    type: str
+    location: Optional[str] = None
+    features: Optional[List[str]] = None
+    mqtt_topic: Optional[str] = None
+
+
+@app.post("/sensors", status_code=status.HTTP_201_CREATED)
+async def create_sensor(sensor: SensorCreate, db=Depends(get_database)):
+    """Register a new sensor"""
+    existing = await db.sensors.find_one({"sensor_id": sensor.sensor_id})
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Sensor '{sensor.sensor_id}' already exists"
+        )
+
+    mqtt_topic = sensor.mqtt_topic or f"sensors/{sensor.sensor_id}"
+
+    sensor_doc = {
+        "sensor_id": sensor.sensor_id,
+        "name": sensor.name,
+        "type": sensor.type,
+        "location": sensor.location,
+        "features": sensor.features or [],
+        "mqtt_topic": mqtt_topic,
+        "status": "active",
+        "created_at": datetime.utcnow(),
+    }
+    await db.sensors.insert_one(sensor_doc)
+    sensor_doc["_id"] = str(sensor_doc["_id"])
+    logger.info(f"Sensor registered: {sensor.sensor_id} -> {mqtt_topic}")
+    return sensor_doc
+
+
 @app.get("/sensors")
 async def get_sensors(db=Depends(get_database)):
     sensors = await db.sensors.find().to_list(100)
+    for s in sensors:
+        s["_id"] = str(s["_id"])
     return {"sensors": sensors, "count": len(sensors)}
 
 @app.get("/sensor-readings")
@@ -438,3 +493,7 @@ async def get_dashboard(db=Depends(get_database)):
         "recent_anomalies": anomaly_count,
         "timestamp": datetime.utcnow().isoformat()
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host=settings.HOST, port=settings.PORT, reload=True)

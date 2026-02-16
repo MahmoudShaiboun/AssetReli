@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
-        "http://frontend:3000"
+        "http://localhost:3000"
     ]
     
     # MongoDB

@@ -40,8 +40,10 @@ class MQTTClient:
         # Notification service
         self.notification_service = NotificationService()
         
-        # Backend API URL for fetching settings
-        self.backend_api_url = "http://backend-api:8000"
+        # Service URLs from config
+        from .config import settings as svc_settings
+        self.backend_api_url = svc_settings.BACKEND_API_URL
+        self.ml_service_url = svc_settings.ML_SERVICE_URL
     
     async def connect(self):
         """Connect to MQTT broker and MongoDB"""
@@ -492,7 +494,7 @@ class MQTTClient:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    "http://ml-service:8001/predict",
+                    f"{self.ml_service_url}/predict",
                     json={"features": features, "top_k": 3},
                     timeout=5.0
                 )

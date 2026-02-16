@@ -12,13 +12,17 @@ class Settings(BaseSettings):
     MQTT_TOPICS: List[str] = ["sensors/#", "equipment/#"]
     
     # MongoDB
-    MONGODB_URL: str = "mongodb://mongodb:27017"
+    MONGODB_URL: str = "http://localhost:27017"
     MONGODB_DB: str = "aastreli"
+
+    # Services
+    BACKEND_API_URL: str = "http://localhost:8008"
+    ML_SERVICE_URL: str = "http://localhost:8001"
     
     # CORS
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
-        "http://localhost:8000",
+        "http://localhost:8008",
         "http://frontend:3000"
     ]
     

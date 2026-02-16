@@ -21,6 +21,7 @@ import {
   Analytics as PredictionsIcon,
   Feedback as FeedbackIcon,
   Settings as SettingsIcon,
+  Sensors as SensorsIcon,
   ShowChart as RealtimeIcon,
   BugReport as FaultIcon,
   AccountCircle
@@ -32,6 +33,7 @@ const drawerWidth = 240;
 
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+  { text: 'Sensors', icon: <SensorsIcon />, path: '/sensors' },
   { text: 'Real-time Data', icon: <RealtimeIcon />, path: '/realtime' },
   { text: 'Predictions', icon: <PredictionsIcon />, path: '/predictions' },
   { text: 'Fault Types', icon: <FaultIcon />, path: '/fault-types' },

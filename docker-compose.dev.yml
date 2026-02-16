@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    extends:
+      file: docker-compose.yml
+      service: mongodb
+
+  mqtt-broker:
+    extends:
+      file: docker-compose.yml
+      service: mqtt-broker
+
+  ml-service:
+    extends:
+      file: docker-compose.yml
+      service: ml-service
+    environment:
+      - MONGODB_URL=mongodb://localhost:27017
+
+  mqtt-ingestion:
+    extends:
+      file: docker-compose.yml
+      service: mqtt-ingestion
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+
+  backend-api:
+    extends:
+      file: docker-compose.yml
+      service: backend-api
+    environment:
+      - MONGODB_URL=mongodb://localhost:27017
+      - ML_SERVICE_URL=http://localhost:8001
+      - MQTT_SERVICE_URL=http://localhost:8002
+
+  frontend:
+    extends:
+      file: docker-compose.yml
+      service: frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8002
+
+networks:
+  aastreli-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  mqtt_data:
+  mqtt_logs:

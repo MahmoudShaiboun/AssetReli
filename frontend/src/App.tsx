@@ -8,6 +8,7 @@ import Feedback from './pages/Feedback';
 import Settings from './pages/Settings';
 import RealtimeData from './pages/RealtimeData';
 import FaultTypes from './pages/FaultTypes';
+import Sensors from './pages/Sensors';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Layout from './components/Layout';
@@ -40,6 +41,11 @@ function App() {
           <Route path="/" element={
             <ProtectedRoute>
               <Layout><Dashboard /></Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/sensors" element={
+            <ProtectedRoute>
+              <Layout><Sensors /></Layout>
             </ProtectedRoute>
           } />
           <Route path="/realtime" element={

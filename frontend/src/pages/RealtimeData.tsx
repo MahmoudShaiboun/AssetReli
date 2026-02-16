@@ -55,24 +55,40 @@ export default function RealtimeData() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     let ws: WebSocket | null = null;
 
-    try {
+    // Defer connection to avoid React 18 StrictMode double-mount teardown
+    const timer = setTimeout(() => {
+      if (cancelled) return;
       ws = connectWebSocket((data: Record<string, SensorData>) => {
-        setSensorData(data);
-        setConnected(true);
-        setError(null);
+        if (!cancelled) {
+          setSensorData(data);
+          setConnected(true);
+          setError(null);
+        }
       });
 
-      return () => {
-        if (ws) {
-          ws.close();
+      ws.onerror = () => {
+        if (!cancelled) {
+          setError('Failed to connect to real-time data stream');
         }
       };
-    } catch (err) {
-      setError('Failed to connect to real-time data stream');
-      console.error('WebSocket error:', err);
-    }
+
+      ws.onclose = () => {
+        if (!cancelled) {
+          setConnected(false);
+        }
+      };
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      if (ws) {
+        ws.close();
+      }
+    };
   }, []);
 
   const formatValue = (value: number | undefined) => {
@@ -88,7 +104,7 @@ export default function RealtimeData() {
     const data = item.data;
     
     // Check if this is complex schema (sensors/data)
-    if (data.motor_DE_vib_band_1 !== undefined) {
+    if (data.motor_DE_vib_band_1 !== undefined ) {
       return {
         sensorId: 'Industrial Sensor',
         temperature: data.motor_DE_temp_c,

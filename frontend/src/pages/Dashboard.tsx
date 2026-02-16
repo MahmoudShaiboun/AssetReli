@@ -22,7 +22,7 @@ import {
   Area
 } from 'recharts';
 import { getDashboard, connectWebSocket } from '../services/api';
-import axios from 'axios';
+import api from '../services/api';
 
 interface SensorData {
   topic: string;
@@ -70,29 +70,36 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchHistoricalData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/sensor-readings', {
+        const response = await api.get('/sensor-readings', {
           params: { skip: 0, limit: 50 }
         });
         const readings = response.data.readings || [];
         const chartData = readings.reverse().map((reading: any) => {
-          // Parse timestamp correctly - it already has Z suffix
-          const timestamp = reading.timestamp.endsWith('Z') 
-            ? new Date(reading.timestamp)
-            : new Date(reading.timestamp + 'Z');
-          
-          // Format as time string for display
-          const timeStr = timestamp.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
+          // Parse timestamp as UTC, then format to local time
+          let ts: string = reading.timestamp || '';
+          if (!ts.endsWith('Z') && !ts.includes('+')) {
+            ts += 'Z';
+          }
+          const date = new Date(ts);
+          const timeStr = date.toLocaleTimeString([], {
+            hour: '2-digit',
             minute: '2-digit',
             second: '2-digit'
           });
 
+          // Support both complex schema (motor_data/pump_data) and
+          // simple schema (temperature/vibration/pressure/humidity)
+          const motorTemp = reading.motor_data?.DE_temp ?? reading.temperature ?? 0;
+          const motorVib = reading.motor_data?.DE_vib_band_1 ?? reading.vibration ?? 0;
+          const pumpTemp = reading.pump_data?.DE_temp ?? reading.pressure ?? 0;
+          const pumpUltra = reading.pump_data?.DE_ultra ?? reading.humidity ?? 0;
+
           return {
             timestamp: timeStr,
-            motor_temp: reading.motor_data?.DE_temp ?? 0,
-            motor_vib: reading.motor_data?.DE_vib_band_1 ?? 0, // Use first vibration band
-            pump_temp: reading.pump_data?.DE_temp ?? 0,
-            pump_ultra: reading.pump_data?.DE_ultra ?? 0,
+            motor_temp: motorTemp,
+            motor_vib: motorVib,
+            pump_temp: pumpTemp,
+            pump_ultra: pumpUltra,
             prediction: reading.prediction,
             confidence: reading.confidence,
             sensor_id: reading.sensor_id
@@ -111,22 +118,33 @@ export default function Dashboard() {
 
   // Connect to WebSocket for real-time data
   useEffect(() => {
+    let cancelled = false;
     let ws: WebSocket | null = null;
 
-    try {
+    // Defer connection to avoid React 18 StrictMode double-mount teardown
+    const timer = setTimeout(() => {
+      if (cancelled) return;
       ws = connectWebSocket((data: Record<string, SensorData>) => {
-        setRealtimeData(data);
-        setConnected(true);
+        if (!cancelled) {
+          setRealtimeData(data);
+          setConnected(true);
+        }
       });
 
-      return () => {
-        if (ws) {
-          ws.close();
+      ws.onclose = () => {
+        if (!cancelled) {
+          setConnected(false);
         }
       };
-    } catch (err) {
-      console.error('WebSocket error:', err);
-    }
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      if (ws) {
+        ws.close();
+      }
+    };
   }, []);
 
   const getLatestRealtimeValues = () => {
@@ -137,11 +155,11 @@ export default function Dashboard() {
     const wsData = Object.values(realtimeData)[0]?.data;
     if (wsData) {
       return {
-        motorTemp: wsData.motor_DE_temp_c,
-        motorVib: wsData.motor_DE_vib_band_1,
-        pumpTemp: wsData.pump_DE_temp_c,
-        pumpUltra: wsData.pump_DE_ultra_db,
-        prediction: latestPrediction, // Use prediction from historical data
+        motorTemp: wsData.motor_DE_temp_c ?? wsData.temperature,
+        motorVib: wsData.motor_DE_vib_band_1 ?? wsData.vibration,
+        pumpTemp: wsData.pump_DE_temp_c ?? wsData.pressure,
+        pumpUltra: wsData.pump_DE_ultra_db ?? wsData.humidity,
+        prediction: latestPrediction,
         state: wsData.state
       };
     }
@@ -393,7 +411,7 @@ export default function Dashboard() {
                     >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="body2">
-                          <strong>Time (UTC):</strong> {reading.timestamp} | <strong>Sensor:</strong> {reading.sensor_id || 'N/A'}
+                          <strong>Time:</strong> {reading.timestamp} | <strong>Sensor:</strong> {reading.sensor_id || 'N/A'}
                         </Typography>
                         <Box>
                           {isAnomaly && (

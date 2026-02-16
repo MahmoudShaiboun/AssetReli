@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8008';
 const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:8002';
 
 const api = axios.create({
@@ -8,6 +8,15 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Attach JWT token to every request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('aastreli_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const getDashboard = async () => {
@@ -40,6 +49,18 @@ export const getSensors = async () => {
   return response.data;
 };
 
+export const createSensor = async (data: {
+  sensor_id: string;
+  name: string;
+  type: string;
+  location?: string;
+  features?: string[];
+  mqtt_topic?: string;
+}) => {
+  const response = await api.post('/sensors', data);
+  return response.data;
+};
+
 export const getSensorData = async (sensorId: string, limit = 100) => {
   const response = await api.get(`/sensors/${sensorId}/data?limit=${limit}`);
   return response.data;
@@ -48,24 +69,28 @@ export const getSensorData = async (sensorId: string, limit = 100) => {
 // WebSocket connection for real-time data
 export const connectWebSocket = (onMessage: (data: any) => void) => {
   const ws = new WebSocket(`${WS_URL}/stream`);
-  
+
   ws.onopen = () => {
     console.log('WebSocket connected');
   };
-  
+
   ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    onMessage(data);
+    try {
+      const data = JSON.parse(event.data);
+      onMessage(data);
+    } catch (e) {
+      console.error('WebSocket message parse error:', e);
+    }
   };
-  
+
   ws.onerror = (error) => {
     console.error('WebSocket error:', error);
   };
-  
+
   ws.onclose = () => {
     console.log('WebSocket disconnected');
   };
-  
+
   return ws;
 };
 

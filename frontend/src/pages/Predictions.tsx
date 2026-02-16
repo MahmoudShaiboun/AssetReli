@@ -32,7 +32,7 @@ export default function Predictions() {
   useEffect(() => {
     const fetchPredictions = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/sensor-readings', {
+        const response = await axios.get('http://localhost:8008/sensor-readings', {
           params: { skip: 0, limit: 100 }
         });
         setPredictions(response.data.readings.filter((r: SensorReading) => r.prediction));

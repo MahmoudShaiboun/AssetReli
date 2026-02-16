@@ -5,6 +5,7 @@ db = db.getSiblingDB('aastreli');
 // Create collections
 db.createCollection('sensors');
 db.createCollection('sensor_data');
+db.createCollection('sensor_readings');
 db.createCollection('predictions');
 db.createCollection('feedback');
 db.createCollection('models');
@@ -19,6 +20,9 @@ db.predictions.createIndex({ "prediction": 1 });
 
 db.feedback.createIndex({ "created_at": -1 });
 db.feedback.createIndex({ "feedback_type": 1 });
+
+db.sensor_readings.createIndex({ "timestamp": -1 });
+db.sensor_readings.createIndex({ "sensor_id": 1, "timestamp": -1 });
 
 // Insert initial fault types
 db.faults.insertMany([
@@ -38,7 +42,8 @@ db.sensors.insertMany([
     location: "Building A",
     status: "active",
     sampling_rate: 1000,
-    features: ["vibration", "temperature", "pressure"]
+    features: ["vibration", "temperature", "pressure"],
+    mqtt_topic: "sensors/pump_01"
   },
   {
     sensor_id: "motor_01",
@@ -47,7 +52,8 @@ db.sensors.insertMany([
     location: "Building A",
     status: "active",
     sampling_rate: 1000,
-    features: ["vibration", "temperature", "current"]
+    features: ["vibration", "temperature", "current"],
+    mqtt_topic: "sensors/motor_01"
   }
 ]);
 
