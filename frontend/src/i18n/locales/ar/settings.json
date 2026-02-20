@@ -1,0 +1,16 @@
+{
+  "title": "الإعدادات",
+  "autoRefresh": "التحديث التلقائي",
+  "refreshInterval": "فترة التحديث (ثوانٍ)",
+  "anomalyThreshold": "حد الشذوذ",
+  "enableNotifications": "تفعيل الإشعارات",
+  "notificationChannels": "قنوات الإشعارات",
+  "email": "البريد الإلكتروني",
+  "sms": "رسالة نصية",
+  "webhook": "ويب هوك",
+  "slack": "سلاك",
+  "saveSettings": "حفظ الإعدادات",
+  "settingsSaved": "تم حفظ الإعدادات بنجاح",
+  "language": "اللغة",
+  "theme": "المظهر"
+}

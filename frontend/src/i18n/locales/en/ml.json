@@ -1,0 +1,21 @@
+{
+  "title": "ML Management",
+  "models": "Models",
+  "modelName": "Model Name",
+  "modelType": "Model Type",
+  "versions": "Versions",
+  "version": "Version",
+  "stage": "Stage",
+  "staging": "Staging",
+  "production": "Production",
+  "archived": "Archived",
+  "deploy": "Deploy",
+  "retrain": "Retrain",
+  "retraining": "Retraining...",
+  "accuracy": "Accuracy",
+  "precision": "Precision",
+  "recall": "Recall",
+  "f1Score": "F1 Score",
+  "deployments": "Deployments",
+  "artifacts": "Artifacts"
+}

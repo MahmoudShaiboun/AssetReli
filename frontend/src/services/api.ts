@@ -1,7 +1,5 @@
 import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8008';
-const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:8002';
+import { API_URL, WS_URL } from '../config';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -44,25 +42,26 @@ export const triggerRetrain = async (selectedDataIds: any = null) => {
   return response.data;
 };
 
-export const getSensors = async () => {
-  const response = await api.get('/sensors');
+export const getSensors = async (assetId?: string) => {
+  const params = assetId ? { asset_id: assetId } : {};
+  const response = await api.get('/sensors', { params });
   return response.data;
 };
 
 export const createSensor = async (data: {
-  sensor_id: string;
-  name: string;
-  type: string;
-  location?: string;
-  features?: string[];
+  asset_id: string;
+  sensor_code: string;
+  sensor_type: string;
+  gateway_id?: string;
+  mount_location?: string;
   mqtt_topic?: string;
 }) => {
   const response = await api.post('/sensors', data);
   return response.data;
 };
 
-export const getSensorData = async (sensorId: string, limit = 100) => {
-  const response = await api.get(`/sensors/${sensorId}/data?limit=${limit}`);
+export const getSensorData = async (sensorCode: string, limit = 100) => {
+  const response = await api.get(`/sensor-data/${sensorCode}?limit=${limit}`);
   return response.data;
 };
 

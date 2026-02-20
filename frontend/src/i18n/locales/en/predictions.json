@@ -1,0 +1,16 @@
+{
+  "title": "Predictions",
+  "predictionLabel": "Prediction",
+  "confidence": "Confidence",
+  "timestamp": "Timestamp",
+  "topPredictions": "Top Predictions",
+  "modelVersion": "Model Version",
+  "feedback": "Feedback",
+  "submitFeedback": "Submit Feedback",
+  "feedbackType": "Feedback Type",
+  "correction": "Correction",
+  "newFault": "New Fault",
+  "falsePositive": "False Positive",
+  "correct": "Correct",
+  "faultTypes": "Fault Types"
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Fault Types",
+  "faultName": "Fault Name",
+  "category": "Category",
+  "description": "Description",
+  "mechanical": "Mechanical",
+  "electrical": "Electrical",
+  "instrumentation": "Instrumentation",
+  "operational": "Operational",
+  "normal": "Normal"
+}

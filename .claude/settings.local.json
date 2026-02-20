@@ -4,7 +4,12 @@
       "Bash(curl:*)",
       "Bash(python:*)",
       "Bash(netstat:*)",
-      "Bash(wmic process where \"ProcessId=27560\" get Name,CommandLine)"
+      "Bash(wmic process where \"ProcessId=27560\" get Name,CommandLine)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(npx react-scripts build)",
+      "Bash(test:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

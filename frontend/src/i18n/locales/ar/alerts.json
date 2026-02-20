@@ -1,0 +1,21 @@
+{
+  "title": "التنبيهات",
+  "alarmRules": "قواعد الإنذار",
+  "alarmEvents": "أحداث الإنذار",
+  "notifications": "الإشعارات",
+  "notificationLog": "سجل الإشعارات",
+  "workOrders": "أوامر العمل",
+  "ruleName": "اسم القاعدة",
+  "parameter": "المعامل",
+  "threshold": "الحد",
+  "severity": "الخطورة",
+  "low": "منخفض",
+  "medium": "متوسط",
+  "high": "مرتفع",
+  "critical": "حرج",
+  "open": "مفتوح",
+  "acknowledged": "تم الإقرار",
+  "resolved": "تم الحل",
+  "acknowledge": "إقرار",
+  "resolve": "حل"
+}

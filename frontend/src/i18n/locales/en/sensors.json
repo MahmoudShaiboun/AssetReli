@@ -1,0 +1,15 @@
+{
+  "title": "Sensors",
+  "sensorId": "Sensor ID",
+  "sensorType": "Sensor Type",
+  "sensorCode": "Sensor Code",
+  "mountLocation": "Mount Location",
+  "mqttTopic": "MQTT Topic",
+  "asset": "Asset",
+  "site": "Site",
+  "gateway": "Gateway",
+  "installationDate": "Installation Date",
+  "addSensor": "Add Sensor",
+  "editSensor": "Edit Sensor",
+  "realtimeData": "Real-time Data"
+}

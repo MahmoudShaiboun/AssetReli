@@ -1,0 +1,13 @@
+{
+  "title": "Dashboard",
+  "recentPredictions": "Recent Predictions",
+  "sensorOverview": "Sensor Overview",
+  "anomalyCount": "Anomaly Count",
+  "normalCount": "Normal Count",
+  "motorTemperature": "Motor Temperature",
+  "motorVibration": "Motor Vibration",
+  "pumpTemperature": "Pump Temperature",
+  "pumpUltrasonic": "Pump Ultrasonic",
+  "lastUpdated": "Last Updated",
+  "healthScore": "Health Score"
+}

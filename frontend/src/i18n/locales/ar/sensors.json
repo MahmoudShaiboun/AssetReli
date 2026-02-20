@@ -1,0 +1,15 @@
+{
+  "title": "المستشعرات",
+  "sensorId": "معرّف المستشعر",
+  "sensorType": "نوع المستشعر",
+  "sensorCode": "رمز المستشعر",
+  "mountLocation": "موقع التركيب",
+  "mqttTopic": "موضوع MQTT",
+  "asset": "الأصل",
+  "site": "الموقع",
+  "gateway": "البوابة",
+  "installationDate": "تاريخ التركيب",
+  "addSensor": "إضافة مستشعر",
+  "editSensor": "تعديل المستشعر",
+  "realtimeData": "البيانات الفورية"
+}

@@ -1,0 +1,21 @@
+{
+  "title": "إدارة التعلم الآلي",
+  "models": "النماذج",
+  "modelName": "اسم النموذج",
+  "modelType": "نوع النموذج",
+  "versions": "الإصدارات",
+  "version": "الإصدار",
+  "stage": "المرحلة",
+  "staging": "تجريبي",
+  "production": "إنتاج",
+  "archived": "مؤرشف",
+  "deploy": "نشر",
+  "retrain": "إعادة التدريب",
+  "retraining": "جاري إعادة التدريب...",
+  "accuracy": "الدقة",
+  "precision": "الإحكام",
+  "recall": "الاستدعاء",
+  "f1Score": "مقياس F1",
+  "deployments": "عمليات النشر",
+  "artifacts": "المخرجات"
+}

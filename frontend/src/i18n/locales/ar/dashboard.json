@@ -1,0 +1,13 @@
+{
+  "title": "لوحة المعلومات",
+  "recentPredictions": "التنبؤات الأخيرة",
+  "sensorOverview": "نظرة عامة على المستشعرات",
+  "anomalyCount": "عدد الحالات الشاذة",
+  "normalCount": "عدد الحالات الطبيعية",
+  "motorTemperature": "حرارة المحرك",
+  "motorVibration": "اهتزاز المحرك",
+  "pumpTemperature": "حرارة المضخة",
+  "pumpUltrasonic": "الموجات فوق الصوتية للمضخة",
+  "lastUpdated": "آخر تحديث",
+  "healthScore": "مؤشر الصحة"
+}

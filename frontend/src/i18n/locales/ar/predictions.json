@@ -1,0 +1,16 @@
+{
+  "title": "التنبؤات",
+  "predictionLabel": "التنبؤ",
+  "confidence": "الثقة",
+  "timestamp": "الوقت",
+  "topPredictions": "أعلى التنبؤات",
+  "modelVersion": "إصدار النموذج",
+  "feedback": "التغذية الراجعة",
+  "submitFeedback": "إرسال التغذية الراجعة",
+  "feedbackType": "نوع التغذية الراجعة",
+  "correction": "تصحيح",
+  "newFault": "عطل جديد",
+  "falsePositive": "إنذار كاذب",
+  "correct": "صحيح",
+  "faultTypes": "أنواع الأعطال"
+}

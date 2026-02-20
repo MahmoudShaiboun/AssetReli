@@ -16,6 +16,27 @@ services:
     networks:
       - aastreli-network
 
+  # PostgreSQL Database
+  reli-postgres:
+    image: postgres:16
+    container_name: aastreli-postgres
+    restart: always
+    ports:
+      - "5431:5432"
+    environment:
+      POSTGRES_DB: aastreli
+      POSTGRES_USER: aastreli
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aastreli_dev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aastreli"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aastreli-network
+
   # MQTT Broker (Mosquitto)
   mqtt-broker:
     image: eclipse-mosquitto:2.0
@@ -44,8 +65,16 @@ services:
     environment:
       - MONGODB_URL=mongodb://mongodb:27017
       - MONGODB_DB=aastreli
+      - POSTGRES_URL=postgresql+asyncpg://aastreli:${POSTGRES_PASSWORD:-aastreli_dev}@reli-postgres:5432/aastreli
+      - API_KEY=${ML_SERVICE_API_KEY:-dev_key}
+      - ARTIFACT_STORE_TYPE=local
+      - ARTIFACT_STORE_PATH=/app/models
+      - MAX_LOADED_MODELS=10
+      - INCLUDE_ORIGINAL_DATA_ON_RETRAIN=true
+      - FEEDBACK_WEIGHT_MULTIPLIER=3.0
     depends_on:
       - mongodb
+      - reli-postgres
     networks:
       - aastreli-network
 
@@ -71,9 +100,17 @@ services:
       - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
       - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
       - TWILIO_FROM_PHONE=${TWILIO_FROM_PHONE:-}
+      - POSTGRES_URL=postgresql+asyncpg://aastreli:${POSTGRES_PASSWORD:-aastreli_dev}@reli-postgres:5432/aastreli
+      - ML_SERVICE_URL=http://ml-service:8001
+      - ML_API_KEY=${ML_SERVICE_API_KEY:-dev_key}
+      - BACKEND_API_URL=http://backend-api:8000
     depends_on:
-      - mongodb
-      - mqtt-broker
+      mongodb:
+        condition: service_started
+      mqtt-broker:
+        condition: service_started
+      reli-postgres:
+        condition: service_healthy
     networks:
       - aastreli-network
 
@@ -90,10 +127,16 @@ services:
       - ML_SERVICE_URL=http://ml-service:8001
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-secret-key-change-in-production}
       - MQTT_SERVICE_URL=http://mqtt-ingestion:8002
+      - POSTGRES_URL=postgresql+asyncpg://aastreli:${POSTGRES_PASSWORD:-aastreli_dev}@reli-postgres:5432/aastreli
     depends_on:
-      - mongodb
-      - ml-service
-      - mqtt-ingestion
+      reli-postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      ml-service:
+        condition: service_started
+      mqtt-ingestion:
+        condition: service_started
     networks:
       - aastreli-network
 
@@ -118,5 +161,6 @@ networks:
 
 volumes:
   mongodb_data:
+  postgres_data:
   mqtt_data:
   mqtt_logs:

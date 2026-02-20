@@ -1,0 +1,11 @@
+{
+  "title": "أنواع الأعطال",
+  "faultName": "اسم العطل",
+  "category": "الفئة",
+  "description": "الوصف",
+  "mechanical": "ميكانيكي",
+  "electrical": "كهربائي",
+  "instrumentation": "أجهزة القياس",
+  "operational": "تشغيلي",
+  "normal": "طبيعي"
+}

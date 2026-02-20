@@ -28,9 +28,27 @@ class Settings(BaseSettings):
         "http://localhost:3000"
     ]
     
+    # PostgreSQL
+    POSTGRES_URL: str = "postgresql+asyncpg://aastreli:aastreli_dev@localhost:5432/aastreli"
+
     # MongoDB
     MONGODB_URL: str = "mongodb://mongodb:27017"
     MONGODB_DB: str = "aastreli"
+
+    # API key for inbound request authentication (legacy)
+    API_KEY: str = "dev_key"
+
+    # Internal service-to-service API key
+    INTERNAL_API_KEY: str = ""
+
+    # Artifact storage
+    ARTIFACT_STORE_TYPE: str = "local"  # "local" or "s3" (future)
+    ARTIFACT_STORE_PATH: str = "/app/models"
+    MAX_LOADED_MODELS: int = 10
+
+    # Retraining enhancements
+    INCLUDE_ORIGINAL_DATA_ON_RETRAIN: bool = True
+    FEEDBACK_WEIGHT_MULTIPLIER: float = 3.0
     
     # XGBoost parameters
     XGBOOST_MAX_DEPTH: int = 8

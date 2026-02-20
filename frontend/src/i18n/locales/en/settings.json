@@ -1,0 +1,16 @@
+{
+  "title": "Settings",
+  "autoRefresh": "Auto Refresh",
+  "refreshInterval": "Refresh Interval (seconds)",
+  "anomalyThreshold": "Anomaly Threshold",
+  "enableNotifications": "Enable Notifications",
+  "notificationChannels": "Notification Channels",
+  "email": "Email",
+  "sms": "SMS",
+  "webhook": "Webhook",
+  "slack": "Slack",
+  "saveSettings": "Save Settings",
+  "settingsSaved": "Settings saved successfully",
+  "language": "Language",
+  "theme": "Theme"
+}

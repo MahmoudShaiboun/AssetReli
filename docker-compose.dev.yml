@@ -12,12 +12,23 @@ services:
       file: docker-compose.yml
       service: mqtt-broker
 
+  reli-postgres:
+    extends:
+      file: docker-compose.yml
+      service: reli-postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   ml-service:
     extends:
       file: docker-compose.yml
       service: ml-service
     environment:
-      - MONGODB_URL=mongodb://localhost:27017
+      - MONGODB_URL=mongodb://mongodb:27017
+      - POSTGRES_URL=postgresql+asyncpg://aastreli:${POSTGRES_PASSWORD:-aastreli_dev}@reli-postgres:5432/aastreli
 
   mqtt-ingestion:
     extends:
@@ -25,15 +36,17 @@ services:
       service: mqtt-ingestion
     environment:
       - MONGODB_URL=mongodb://mongodb:27017
+      - POSTGRES_URL=postgresql+asyncpg://aastreli:${POSTGRES_PASSWORD:-aastreli_dev}@reli-postgres:5432/aastreli
 
   backend-api:
     extends:
       file: docker-compose.yml
       service: backend-api
     environment:
-      - MONGODB_URL=mongodb://localhost:27017
-      - ML_SERVICE_URL=http://localhost:8001
-      - MQTT_SERVICE_URL=http://localhost:8002
+      - MONGODB_URL=mongodb://mongodb:27017
+      - ML_SERVICE_URL=http://ml-service:8001
+      - MQTT_SERVICE_URL=http://mqtt-ingestion:8002
+      - POSTGRES_URL=postgresql+asyncpg://aastreli:${POSTGRES_PASSWORD:-aastreli_dev}@reli-postgres:5432/aastreli
 
   frontend:
     extends:
@@ -49,5 +62,6 @@ networks:
 
 volumes:
   mongodb_data:
+  postgres_data:
   mqtt_data:
   mqtt_logs:

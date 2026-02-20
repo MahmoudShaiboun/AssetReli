@@ -55,8 +55,8 @@ export default function Register() {
         formData.password,
         formData.fullName || undefined
       );
-      setSuccess(true);
-      setTimeout(() => navigate('/login'), 2000);
+      // Register now returns a token and auto-logs in
+      navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed. Please try again.');
     } finally {

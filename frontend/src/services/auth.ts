@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8008';
+import { API_URL } from '../config';
 
 interface LoginResponse {
   access_token: string;
@@ -8,10 +7,13 @@ interface LoginResponse {
 }
 
 interface User {
+  id: string;
+  tenant_id: string;
   email: string;
   username: string;
   full_name?: string;
-  disabled: boolean;
+  role: string;
+  is_active: boolean;
 }
 
 class AuthService {
@@ -21,29 +23,30 @@ class AuthService {
   async login(email: string, password: string): Promise<LoginResponse> {
     const response = await axios.post<LoginResponse>(
       `${API_URL}/login`,
-      null,
-      {
-        params: { email, password }
-      }
+      { email, password }
     );
-    
+
     if (response.data.access_token) {
       localStorage.setItem(this.tokenKey, response.data.access_token);
-      // Fetch user info
       await this.fetchUserInfo();
     }
-    
+
     return response.data;
   }
 
-  async register(email: string, username: string, password: string, fullName?: string): Promise<User> {
-    const response = await axios.post<User>(`${API_URL}/register`, {
+  async register(email: string, username: string, password: string, fullName?: string): Promise<LoginResponse> {
+    const response = await axios.post<LoginResponse>(`${API_URL}/register`, {
       email,
       username,
       password,
       full_name: fullName
     });
-    
+
+    if (response.data.access_token) {
+      localStorage.setItem(this.tokenKey, response.data.access_token);
+      await this.fetchUserInfo();
+    }
+
     return response.data;
   }
 
@@ -55,7 +58,7 @@ class AuthService {
       const response = await axios.get<User>(`${API_URL}/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       localStorage.setItem(this.userKey, JSON.stringify(response.data));
       return response.data;
     } catch (error) {

@@ -1,0 +1,21 @@
+{
+  "title": "Alerts",
+  "alarmRules": "Alarm Rules",
+  "alarmEvents": "Alarm Events",
+  "notifications": "Notifications",
+  "notificationLog": "Notification Log",
+  "workOrders": "Work Orders",
+  "ruleName": "Rule Name",
+  "parameter": "Parameter",
+  "threshold": "Threshold",
+  "severity": "Severity",
+  "low": "Low",
+  "medium": "Medium",
+  "high": "High",
+  "critical": "Critical",
+  "open": "Open",
+  "acknowledged": "Acknowledged",
+  "resolved": "Resolved",
+  "acknowledge": "Acknowledge",
+  "resolve": "Resolve"
+}
